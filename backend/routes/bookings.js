@@ -15,30 +15,35 @@ router.get('/', async (req, res) => {
 
 // Create a booking
 router.post('/', async (req, res) => {
-  const { roomId, startTime, endTime } = req.body;
-
-  // Check for overlapping bookings
-  const overlap = await Booking.findOne({
-    roomId,
-    startTime: { $lt: new Date(endTime) },
-    endTime: { $gt: new Date(startTime) }
-  });
-
-  if (overlap) {
-    return res.status(400).json({ message: "Room already booked for this time slot" });
-  }
-
-  const booking = new Booking({
-    roomId,
-    startTime,
-    endTime,
-  });
-
   try {
+    const { roomId, startTime, endTime } = req.body;
+
+    if (!roomId || !startTime || !endTime) {
+      return res.status(400).json({ message: "Missing required fields: roomId, startTime, endTime" });
+    }
+
+    // Check for overlapping bookings
+    const overlap = await Booking.findOne({
+      roomId,
+      startTime: { $lt: new Date(endTime) },
+      endTime: { $gt: new Date(startTime) }
+    });
+
+    if (overlap) {
+      return res.status(400).json({ message: "Room already booked for this time slot" });
+    }
+
+    const booking = new Booking({
+      roomId,
+      startTime,
+      endTime,
+    });
+
     const newBooking = await booking.save();
     res.status(201).json(newBooking);
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    console.error('POST /bookings error:', err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
   }
 });
 
