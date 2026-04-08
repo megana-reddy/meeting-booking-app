@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 function App() {
+  const apiBase = 'https://meeting-booking-app-fbpt.onrender.com';
   const roomOptions = ['Room A', 'Room B', 'Room C'];
   const [bookings, setBookings] = useState([]);
   const [roomId, setRoomId] = useState('');
@@ -54,7 +55,7 @@ function App() {
 
   const fetchBookings = async () => {
     try {
-      const response = await fetch('http://localhost:5000/bookings');
+      const response = await fetch(`${apiBase}/bookings`);
       if (!response.ok) {
         throw new Error('Failed to load bookings');
       }
@@ -74,7 +75,7 @@ function App() {
     setSuccess(null);
 
     try {
-      const response = await fetch('http://localhost:5000/bookings', {
+      const response = await fetch(`${apiBase}/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
